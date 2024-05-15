@@ -8,5 +8,6 @@
 </head>
 <body>
 	<p>Welcome Admin</p>
+	<a href="./BookServlet?op=list">Books</a>
 </body>
 </html>

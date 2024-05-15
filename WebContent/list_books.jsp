@@ -26,6 +26,12 @@
                     <td><%= book.getTitle() %></td>
                     <td><%= book.getPublication_year() %></td>
                     <td><%= book.getAuthor().getName() %></td>
+                    <td>
+                        <form action="./BookServlet" method="get">
+                            <input type="hidden" name="bookId" value="<%= book.getId() %>">
+                            <input type="submit" name="op" value="delete">
+                        </form>
+                    </td>
                 </tr>
             <%
                     }

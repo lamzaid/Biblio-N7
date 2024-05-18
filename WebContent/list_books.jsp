@@ -1,49 +1,35 @@
-<%@ page import="java.util.List" %>
-<%@ page import="fr.enseeiht.biblio.entity.Book" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>List of Books</title>
+    <title>Available Books</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <h1>List of Books</h1>
-    <table border="1">
-        <thead>
+    <h2>Available Books</h2>
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Publication Year</th>
+            <th>Action</th>
+        </tr>
+        <c:forEach var="book" items="${books}">
             <tr>
-                <th>Title</th>
-                <th>Publication Year</th>
-                <th>Author</th>
+                <td>${book.title}</td>
+                <td>${book.author.name}</td>
+                <td>${book.publication_year}</td>
+                <td>
+                    <form action="StudentServlet" method="post">
+                        <input type="hidden" name="op" value="reserve">
+                        <input type="hidden" name="bookId" value="${book.id}">
+                        <button type="submit">Reserve</button>
+                    </form>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            <%
-                List<Book> books = (List<Book>) request.getAttribute("books");
-                if (books != null) {
-                    for (Book book : books) {
-            %>
-                <tr>
-                    <td><%= book.getTitle() %></td>
-                    <td><%= book.getPublication_year() %></td>
-                    <td><%= book.getAuthor().getName() %></td>
-                    <td>
-                        <form action="./BookServlet" method="get">
-                            <input type="hidden" name="bookId" value="<%= book.getId() %>">
-                            <input type="submit" name="op" value="delete">
-                        </form>
-                    </td>
-                </tr>
-            <%
-                    }
-                } else {
-            %>
-                <tr>
-                    <td colspan="3">No books available</td>
-                </tr>
-            <%
-                }
-            %>
-        </tbody>
+        </c:forEach>
     </table>
 </body>
 </html>

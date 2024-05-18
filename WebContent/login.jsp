@@ -1,24 +1,28 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Login Page</title>
-<style>
-    .error {
-        color: red;
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <% if ("true".equals(request.getAttribute("error"))) { %>
-        <p class="error">Invalid e-mail or password.</p>
-    <% } %>
-    <form action="LoginServlet" method="post">
-	    Mail: <input type="text" name="email" required><br>
-	    Password: <input type="password" name="password" required><br>
-	    <input type="submit" value="Login">
-    </form>
+    <div class="container">
+        <c:if test="${not empty error}">
+            <p class="error">Invalid email or password.</p>
+        </c:if>
+        <form action="LoginServlet" method="post" class="form-style">
+            <div class="form-group">
+                <label for="email">Mail:</label>
+                <input type="text" name="email" id="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" name="password" id="password" required placeholder="Enter your password">
+            </div>
+            <input type="submit" value="Login">
+        </form>
+    </div>
 </body>
 </html>

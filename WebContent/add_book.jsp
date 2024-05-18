@@ -1,19 +1,30 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="fr.enseeiht.biblio.entity.Author" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Add Book</title>
+    <meta charset="UTF-8">
+    <title>Add Book</title>
 </head>
 <body>
-	<h2>Add New Admin</h2>
-	<form action="AddAdminServlet" method="post">
-		First Name: <input type="text" name="firstName"><br>
-		Last Name: <input type="text" name="lastName"><br>
-		Email: <input type="email" name="email"><br>
-		Password: <input type="password" name="password"><br>
-        <input type="submit" value="Submit">
-	</form>
+    <h2>Add a New Book</h2>
+    <form action="BookServlet" method="post">
+        <input type="hidden" name="op" value="add">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br><br>
+        <label for="year">Publication Year:</label>
+        <input type="number" id="year" name="publication_year" required><br><br>
+        <label for="author">Author:</label>
+        <select id="author" name="author_id">
+            <% 
+                List<Author> authors = (List<Author>) request.getAttribute("authors");
+                for (Author author : authors) {
+                    out.println("<option value=\"" + author.getId() + "\">" + author.getName() + "</option>");
+                }
+            %>
+        </select><br><br>
+        <button type="submit">Add Book</button>
+    </form>
 </body>
 </html>

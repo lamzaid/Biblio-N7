@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import fr.enseeiht.biblio.entity.Student;
 import fr.enseeiht.biblio.facade.LoginFacade;
+import fr.enseeiht.biblio.facade.StudentFacade;
 
 /**
  * Servlet implementation class LoginServlet
@@ -19,6 +21,8 @@ public class LoginServlet extends HttpServlet {
 	
 	@EJB
     private LoginFacade loginFacade;
+	@EJB
+	private StudentFacade studentFacade;
 	
 	private static final long serialVersionUID = 1L;
        
@@ -48,6 +52,8 @@ public class LoginServlet extends HttpServlet {
         if(loginFacade.isAdmin(email, password)) {
         	response.sendRedirect("./admin_dashboard.jsp");
         }else if(loginFacade.isStudent(email, password)) {
+        	Student student = studentFacade.findByEmailAndPassword(email, password);
+        	request.getSession().setAttribute("studentId", student.getId());
         	response.sendRedirect("./student_dashboard.jsp");
         }else {
         	request.setAttribute("error", "true");

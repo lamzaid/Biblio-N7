@@ -12,7 +12,7 @@
         <class>fr.enseeiht.biblio.entity.Student</class>
         <class>fr.enseeiht.biblio.entity.Author</class>
         <class>fr.enseeiht.biblio.entity.Book</class>
-        
+        <class>fr.enseeiht.biblio.entity.Reservation</class>
         
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />

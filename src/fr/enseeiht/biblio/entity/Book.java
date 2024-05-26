@@ -1,11 +1,16 @@
 package fr.enseeiht.biblio.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -23,6 +28,9 @@ public class Book {
     
    	@ManyToOne
     private Author author;
+   	
+   	@OneToMany(mappedBy = "book", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Exemplaire> exemplaires;
 
    	// Constructors, getters and setters
    	public Book() {}
@@ -64,5 +72,13 @@ public class Book {
 	public void setAuthor(Author author) {
 		this.author = author;
 	}
+	
+	public List<Exemplaire> getExemplaires() {
+        return exemplaires;
+    }
+
+    public void setExemplaires(List<Exemplaire> exemplaires) {
+        this.exemplaires = exemplaires;
+    }
 
 }

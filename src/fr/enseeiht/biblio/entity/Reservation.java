@@ -11,25 +11,25 @@ public class Reservation {
     private int id;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "student_id")
     private Student student;
 
     @ManyToOne(optional = false)
-    private Book book;
+    @JoinColumn(name = "exemplaire_id")
+    private Exemplaire exemplaire;
 
-    @Column(nullable = false)
+    @Column(name = "reserved_at", nullable = false)
     private LocalDateTime reservedAt;
-    
-    @Column
+
+    @Column(name = "validated", nullable = false)
     private boolean validated;
 
-    // Constructors, getters and setters
-    public Reservation() {
-    	this.validated = false;
-    }
+    // Constructors, getters, and setters
+    public Reservation() {}
 
-    public Reservation(Student student, Book book) {
+    public Reservation(Student student, Exemplaire exemplaire) {
         this.student = student;
-        this.book = book;
+        this.exemplaire = exemplaire;
         this.reservedAt = LocalDateTime.now();
         this.validated = false;
     }
@@ -50,12 +50,12 @@ public class Reservation {
 		this.student = student;
 	}
 
-	public Book getBook() {
-		return book;
+	public Exemplaire getExemplaire() {
+		return exemplaire;
 	}
 
-	public void setBook(Book book) {
-		this.book = book;
+	public void setExemplaire(Exemplaire exemplaire) {
+		this.exemplaire = exemplaire;
 	}
 
 	public LocalDateTime getReservedAt() {
@@ -65,13 +65,15 @@ public class Reservation {
 	public void setReservedAt(LocalDateTime reservedAt) {
 		this.reservedAt = reservedAt;
 	}
-	
-	public boolean isValidated() {
-        return validated;
-    }
 
-    public void setValidated(boolean validated) {
-        this.validated = validated;
-    }
-	
+	public boolean isValidated() {
+		return validated;
+	}
+
+	public void setValidated(boolean validated) {
+		this.validated = validated;
+	}
+
+
+
 }

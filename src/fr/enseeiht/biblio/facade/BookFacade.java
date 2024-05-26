@@ -46,4 +46,9 @@ public class BookFacade {
             Book.class);
         return query.getResultList();
     }
+
+	public void update(Book newBook) {
+		em.merge(newBook);
+		
+	}
 }

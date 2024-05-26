@@ -2,7 +2,6 @@ package fr.enseeiht.biblio.servlet;
 
 import java.io.IOException;
 import java.util.List;
-
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -26,8 +25,7 @@ public class AdminServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String op = request.getParameter("op");
-
-        if (op != null && op.equals("list_reservations")) {
+        if (op != null && op.equals("reservations")) {
             List<Reservation> reservations = reservationFacade.findAll();
             request.setAttribute("reservations", reservations);
             request.getRequestDispatcher("./admin_reservations.jsp").forward(request, response);
@@ -38,16 +36,13 @@ public class AdminServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String op = request.getParameter("op");
-
         if (op != null && op.equals("validate")) {
             int reservationId = Integer.parseInt(request.getParameter("reservationId"));
             Reservation reservation = reservationFacade.find(reservationId);
-            if (reservation != null) {
-                reservation.setValidated(true);
-                reservationFacade.update(reservation);
-            }
+            reservation.setValidated(true);
+            reservationFacade.update(reservation);
 
-            response.sendRedirect("./AdminServlet?op=list_reservations");
+            response.sendRedirect("./AdminServlet?op=reservations");
         } else {
             doGet(request, response);
         }

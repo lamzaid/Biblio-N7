@@ -74,6 +74,8 @@ public class Reservation {
 		this.validated = validated;
 	}
 
-
+	public boolean isActive() {
+        return !validated;
+    }
 
 }

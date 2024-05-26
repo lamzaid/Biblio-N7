@@ -41,10 +41,7 @@ public class StudentServlet extends HttpServlet {
         String op = request.getParameter("op");
         Integer studentId = (Integer) request.getSession().getAttribute("studentId");
 
-        System.out.println("Retrieved studentId from session: " + studentId);
-
         if (studentId == null) {
-            System.out.println("studentId is null, redirecting to login.jsp");
             response.sendRedirect("login.jsp");
             return;
         }
@@ -62,7 +59,7 @@ public class StudentServlet extends HttpServlet {
                     request.getRequestDispatcher("./student_reservations.jsp").forward(request, response);
                     break;
                 default:
-                    throw new IllegalStateException("This error should never be triggered");
+                    throw new IllegalStateException("Unexpected value: " + op);
             }
         } else {
             throw new IllegalStateException("Operation parameter 'op' is missing");
@@ -74,44 +71,50 @@ public class StudentServlet extends HttpServlet {
 
         Integer studentId = (Integer) request.getSession().getAttribute("studentId");
 
-        System.out.println("Retrieved studentId from session in doPost: " + studentId);
-
         if (studentId == null) {
-            System.out.println("studentId is null in doPost, redirecting to login.jsp");
             response.sendRedirect("login.jsp");
             return;
         }
 
-        int bookId = Integer.parseInt(request.getParameter("bookId"));
-
         if (op != null) {
             switch (op) {
                 case "reserve":
-                    List<Exemplaire> exemplaires = exemplaireFacade.findAvailableByBook(bookId);
-                    if (!exemplaires.isEmpty()) {
-                        Exemplaire exemplaire = exemplaires.get(0);
-                        exemplaire.setDisponible(false);
-                        exemplaireFacade.update(exemplaire);
+                    try {
+                        int bookId = Integer.parseInt(request.getParameter("bookId"));
+                        List<Exemplaire> exemplaires = exemplaireFacade.findAvailableByBook(bookId);
+                        if (!exemplaires.isEmpty()) {
+                            Exemplaire exemplaire = exemplaires.get(0);
+                            exemplaire.setDisponible(false);
+                            exemplaireFacade.update(exemplaire);
 
-                        Reservation reservation = new Reservation(studentFacade.find(studentId), exemplaire);
-                        reservationFacade.create(reservation);
+                            Reservation reservation = new Reservation(studentFacade.find(studentId), exemplaire);
+                            reservationFacade.create(reservation);
 
-                        response.sendRedirect("./StudentServlet?op=reservations");
-                    } else {
-                        response.sendRedirect("./StudentServlet?op=list_books&error=no_copies");
+                            response.sendRedirect("./StudentServlet?op=reservations");
+                        } else {
+                            response.sendRedirect("./StudentServlet?op=list_books&error=no_copies");
+                        }
+                    } catch (NumberFormatException | NullPointerException e) {
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid bookId parameter");
                     }
                     break;
                 case "cancel":
-                	String reservationIdStr = request.getParameter("reservationId");
-                    if (reservationIdStr != null && !reservationIdStr.isEmpty()) {
-                        int reservationId = Integer.parseInt(reservationIdStr);
-                        Reservation reservation = reservationFacade.find(reservationId);
-                        Exemplaire exemplaire = reservation.getExemplaire();
-                        exemplaire.setDisponible(true);
-                        exemplaireFacade.update(exemplaire);
-                        reservationFacade.cancel(reservationId);
+                    try {
+                        String reservationIdStr = request.getParameter("reservationId");
+                        if (reservationIdStr != null && !reservationIdStr.isEmpty()) {
+                            int reservationId = Integer.parseInt(reservationIdStr);
+                            Reservation reservation = reservationFacade.find(reservationId);
+                            Exemplaire exemplaire = reservation.getExemplaire();
+                            exemplaire.setDisponible(true);
+                            exemplaireFacade.update(exemplaire);
+                            reservationFacade.cancel(reservationId);
 
-                        response.sendRedirect("./StudentServlet?op=reservations");
+                            response.sendRedirect("./StudentServlet?op=reservations");
+                        } else {
+                            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing reservationId parameter");
+                        }
+                    } catch (NumberFormatException e) {
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid reservationId parameter");
                     }
                     break;
                 default:

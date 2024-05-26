@@ -1,4 +1,5 @@
 package fr.enseeiht.biblio.entity;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -15,6 +16,10 @@ public class Exemplaire {
     @ManyToOne(optional = false)
     @JoinColumn(name = "book_id")
     private Book book;
+    
+    @OneToMany(mappedBy = "exemplaire", fetch = FetchType.EAGER)
+    private List<Reservation> reservations;
+    
 
     // Constructors, getters, and setters
     public Exemplaire() {
@@ -48,5 +53,14 @@ public class Exemplaire {
 
     public void setBook(Book book) {
         this.book = book;
+    }
+    
+    public Reservation getCurrentReservation() {
+        if (reservations != null) {
+            for (Reservation reservation : reservations) {
+                return reservation;
+            }
+        }
+        return null;
     }
 }

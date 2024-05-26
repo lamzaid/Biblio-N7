@@ -28,7 +28,6 @@
                     out.println("<td>" + reservation.getReservedAt() + "</td>");
                     out.println("<td><form action='StudentServlet' method='post'>");
                     out.println("<input type='hidden' name='op' value='cancel'>");
-                    out.println("<input type='hidden' name='studentId' value='" + reservation.getStudent().getId() + "'>");
                     out.println("<input type='hidden' name='reservationId' value='" + reservation.getId() + "'>");
                     out.println("<button type='submit'>Cancel</button>");
                     out.println("</form></td>");

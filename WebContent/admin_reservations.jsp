@@ -16,6 +16,7 @@
             <th>Author</th>
             <th>Reserved At</th>
             <th>Status</th>
+            <th>Reserved By</th>
             <th>Action</th>
         </tr>
         <%
@@ -29,6 +30,7 @@
             <td><%= reservation.getExemplaire().getBook().getAuthor().getName() %></td>
             <td><%= reservation.getReservedAt() %></td>
             <td><%= reservation.isValidated() ? "Validated" : "Pending" %></td>
+            <td><%= reservation.getStudent().getFirstName() + " " + reservation.getStudent().getLastName() %></td>
             <td>
                 <form action="AdminServlet" method="post">
                     <input type="hidden" name="op" value="validate">
@@ -42,7 +44,7 @@
             } else {
         %>
         <tr>
-            <td colspan="6">No reservations found</td>
+            <td colspan="7">No reservations found</td>
         </tr>
         <%
             }

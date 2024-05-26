@@ -16,6 +16,7 @@
             <th>ID</th>
             <th>Disponibilité</th>
             <th>Réservé par</th>
+            <th>Action</th>
         </tr>
         <%
             List<Exemplaire> exemplaires = (List<Exemplaire>) request.getAttribute("exemplaires");
@@ -26,14 +27,21 @@
         <tr>
             <td><%= exemplaire.getId() %></td>
             <td><%= exemplaire.getDisponible() ? "Disponible" : (reservation.isValidated() ? "Validée" : "Réservé") %></td>
-            <td><%= reservation != null ? reservation.getStudent().getFirstName() + " " + reservation.getStudent().getLastName() : "N/A" %></td>
+            <td><%= reservation != null && !exemplaire.getDisponible() ? reservation.getStudent().getFirstName() + " " + reservation.getStudent().getLastName() : "N/A" %></td>
+            <td>
+                <form action="AdminServlet" method="post">
+                    <input type="hidden" name="op" value="return">
+                    <input type="hidden" name="exemplaireId" value="<%= exemplaire.getId() %>">
+                    <button type="submit" <%= (reservation == null || !reservation.isValidated()) ? "disabled" : "" %>>Return</button>
+                </form>
+            </td>
         </tr>
         <%
                 }
             } else {
         %>
         <tr>
-            <td colspan="3">No exemplaires available</td>
+            <td colspan="4">No exemplaires available</td>
         </tr>
         <%
             }

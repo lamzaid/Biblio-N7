@@ -9,13 +9,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import fr.enseeiht.biblio.entity.Exemplaire;
 import fr.enseeiht.biblio.entity.Reservation;
+import fr.enseeiht.biblio.facade.ExemplaireFacade;
 import fr.enseeiht.biblio.facade.ReservationFacade;
 
 @WebServlet("/AdminServlet")
 public class AdminServlet extends HttpServlet {
     @EJB
     private ReservationFacade reservationFacade;
+    
+    @EJB
+    private ExemplaireFacade exemplaireFacade;
 
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +48,19 @@ public class AdminServlet extends HttpServlet {
             reservationFacade.update(reservation);
 
             response.sendRedirect("./AdminServlet?op=reservations");
-        } else {
+        } else if (op != null && op.equals("return")){
+        	int exemplaireId = Integer.parseInt(request.getParameter("exemplaireId"));
+            Exemplaire exemplaire = exemplaireFacade.find(exemplaireId);
+            Reservation reservation = exemplaire.getCurrentReservation();
+            if (reservation != null && reservation.isValidated()) {
+                reservation.setValidated(false);
+                reservationFacade.update(reservation);
+                exemplaire.setDisponible(true); 
+                exemplaireFacade.update(exemplaire);
+            }
+            response.sendRedirect("BookServlet?op=view_exemplaires&bookId=" + exemplaire.getBook().getId());
+        }
+        else {
             doGet(request, response);
         }
     }

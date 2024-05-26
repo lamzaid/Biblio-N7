@@ -15,6 +15,7 @@
             <th>Publication Year</th>
             <th>Author</th>
             <th>Reserved At</th>
+            <th>Status</th>
             <th>Action</th>
         </tr>
         <%
@@ -26,6 +27,7 @@
                     out.println("<td>" + reservation.getExemplaire().getBook().getPublication_year() + "</td>");
                     out.println("<td>" + reservation.getExemplaire().getBook().getAuthor().getName() + "</td>");
                     out.println("<td>" + reservation.getReservedAt() + "</td>");
+                    out.println("<td>" + reservation.getStatus() + "</td>");
                     out.println("<td><form action='StudentServlet' method='post'>");
                     out.println("<input type='hidden' name='op' value='cancel'>");
                     out.println("<input type='hidden' name='reservationId' value='" + reservation.getId() + "'>");
@@ -36,7 +38,7 @@
             } else {
         %>
         <tr>
-            <td colspan="5">No reservations found</td>
+            <td colspan="6">No reservations found</td>
         </tr>
         <%
             }

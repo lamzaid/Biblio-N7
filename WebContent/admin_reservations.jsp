@@ -23,6 +23,8 @@
             List<Reservation> reservations = (List<Reservation>) request.getAttribute("reservations");
             if (reservations != null && !reservations.isEmpty()) {
                 for (Reservation reservation : reservations) {
+                    // Ne pas afficher les réservations dont l'exemplaire est disponible (c'est-à-dire retourné)
+                    if (!reservation.getExemplaire().getDisponible()) {
         %>
         <tr>
             <td><%= reservation.getExemplaire().getBook().getTitle() %></td>
@@ -40,6 +42,7 @@
             </td>
         </tr>
         <%
+                    }
                 }
             } else {
         %>

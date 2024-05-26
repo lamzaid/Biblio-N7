@@ -77,5 +77,15 @@ public class Reservation {
 	public boolean isActive() {
         return !validated;
     }
+	
+	public String getStatus() {
+        if (this.getExemplaire().getDisponible()) {
+            return "Retourné";
+        } else if (this.validated) {
+            return "Validée";
+        } else {
+            return "Réservé";
+        }
+    }
 
 }

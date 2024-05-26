@@ -8,9 +8,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import fr.enseeiht.biblio.entity.Reservation;
+
 import fr.enseeiht.biblio.entity.Book;
+import fr.enseeiht.biblio.entity.Exemplaire;
+import fr.enseeiht.biblio.entity.Reservation;
 import fr.enseeiht.biblio.facade.BookFacade;
+import fr.enseeiht.biblio.facade.ExemplaireFacade;
 import fr.enseeiht.biblio.facade.ReservationFacade;
 import fr.enseeiht.biblio.facade.StudentFacade;
 
@@ -18,6 +21,9 @@ import fr.enseeiht.biblio.facade.StudentFacade;
 public class StudentServlet extends HttpServlet {
     @EJB
     private BookFacade bookFacade;
+
+    @EJB
+    private ExemplaireFacade exemplaireFacade;
 
     @EJB
     private ReservationFacade reservationFacade;
@@ -35,24 +41,28 @@ public class StudentServlet extends HttpServlet {
         String op = request.getParameter("op");
         Integer studentId = (Integer) request.getSession().getAttribute("studentId");
 
-        System.out.println("Retrieved studentId from session: " + studentId);
-
         if (studentId == null) {
-            System.out.println("studentId is null, redirecting to login.jsp");
             response.sendRedirect("login.jsp");
             return;
         }
 
-        if (op != null && op.equals("list_books")) {
-            List<Book> books = bookFacade.findAllAvailable();
-            request.setAttribute("books", books);
-            request.getRequestDispatcher("./list_books.jsp").forward(request, response);
-        } else if (op != null && op.equals("reservations")) {
-            List<Reservation> reservations = reservationFacade.findByStudent(studentId);
-            request.setAttribute("reservations", reservations);
-            request.getRequestDispatcher("./student_reservations.jsp").forward(request, response);
+        if (op != null) {
+            switch (op) {
+                case "list_books":
+                    List<Book> books = bookFacade.findAll();
+                    request.setAttribute("books", books);
+                    request.getRequestDispatcher("./list_books.jsp").forward(request, response);
+                    break;
+                case "reservations":
+                    List<Reservation> reservations = reservationFacade.findByStudent(studentId);
+                    request.setAttribute("reservations", reservations);
+                    request.getRequestDispatcher("./student_reservations.jsp").forward(request, response);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + op);
+            }
         } else {
-            throw new IllegalStateException("This error should never be triggered");
+            throw new IllegalStateException("Operation parameter 'op' is missing");
         }
     }
 
@@ -61,36 +71,57 @@ public class StudentServlet extends HttpServlet {
 
         Integer studentId = (Integer) request.getSession().getAttribute("studentId");
 
-        System.out.println("Retrieved studentId from session in doPost: " + studentId);
-
         if (studentId == null) {
-            System.out.println("studentId is null in doPost, redirecting to login.jsp");
             response.sendRedirect("login.jsp");
             return;
         }
 
-        if (op != null && op.equals("reserve")) {
-            int bookId = Integer.parseInt(request.getParameter("bookId"));
-            Book book = bookFacade.find(bookId); // Fetch book entity by bookId
+        if (op != null) {
+            switch (op) {
+                case "reserve":
+                    try {
+                        int bookId = Integer.parseInt(request.getParameter("bookId"));
+                        List<Exemplaire> exemplaires = exemplaireFacade.findAvailableByBook(bookId);
+                        if (!exemplaires.isEmpty()) {
+                            Exemplaire exemplaire = exemplaires.get(0);
+                            exemplaire.setDisponible(false);
+                            exemplaireFacade.update(exemplaire);
 
-            Reservation reservation = new Reservation(studentFacade.find(studentId), book);
-            reservationFacade.create(reservation);
+                            Reservation reservation = new Reservation(studentFacade.find(studentId), exemplaire);
+                            reservationFacade.create(reservation);
 
-            response.sendRedirect("./StudentServlet?op=reservations");
-        } else if (op != null && op.equals("cancel")) {
-            try {
-                String reservationIdStr = request.getParameter("reservationId");
-                System.out.println("reservationIdStr: " + reservationIdStr);
-                int reservationId = Integer.parseInt(reservationIdStr);
-                reservationFacade.cancel(reservationId);
+                            response.sendRedirect("./StudentServlet?op=reservations");
+                        } else {
+                            response.sendRedirect("./StudentServlet?op=list_books&error=no_copies");
+                        }
+                    } catch (NumberFormatException | NullPointerException e) {
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid bookId parameter");
+                    }
+                    break;
+                case "cancel":
+                    try {
+                        String reservationIdStr = request.getParameter("reservationId");
+                        if (reservationIdStr != null && !reservationIdStr.isEmpty()) {
+                            int reservationId = Integer.parseInt(reservationIdStr);
+                            Reservation reservation = reservationFacade.find(reservationId);
+                            Exemplaire exemplaire = reservation.getExemplaire();
+                            exemplaire.setDisponible(true);
+                            exemplaireFacade.update(exemplaire);
+                            reservationFacade.cancel(reservationId);
 
-                response.sendRedirect("./StudentServlet?op=reservations");
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid reservation ID");
+                            response.sendRedirect("./StudentServlet?op=reservations");
+                        } else {
+                            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing reservationId parameter");
+                        }
+                    } catch (NumberFormatException e) {
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid reservationId parameter");
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown operation in doPost: " + op);
             }
         } else {
-            doGet(request, response);
+            throw new IllegalStateException("Operation parameter 'op' is missing in doPost");
         }
     }
 }

@@ -20,20 +20,27 @@
         </tr>
         <%
             List<Reservation> reservations = (List<Reservation>) request.getAttribute("reservations");
-            for (Reservation reservation : reservations) {
-                out.println("<tr>");
-                out.println("<td>" + reservation.getBook().getTitle() + "</td>");
-                out.println("<td>" + reservation.getBook().getPublication_year() + "</td>");
-                out.println("<td>" + reservation.getBook().getAuthor().getName() + "</td>");
-                out.println("<td>" + reservation.getReservedAt() + "</td>");
-                out.println("<td>" + (reservation.isValidated() ? "Reservation Validated" : "Pending") + "</td>");
-                out.println("<td><form action='StudentServlet' method='post'>");
-                out.println("<input type='hidden' name='op' value='cancel'>");
-                out.println("<input type='hidden' name='studentId' value='" + reservation.getStudent().getId() + "'>");
-                out.println("<input type='hidden' name='reservationId' value='" + reservation.getId() + "'>");
-                out.println("<button type='submit'>Cancel</button>");
-                out.println("</form></td>");
-                out.println("</tr>");
+            if (reservations != null) {
+                for (Reservation reservation : reservations) {
+                    out.println("<tr>");
+                    out.println("<td>" + reservation.getExemplaire().getBook().getTitle() + "</td>");
+                    out.println("<td>" + reservation.getExemplaire().getBook().getPublication_year() + "</td>");
+                    out.println("<td>" + reservation.getExemplaire().getBook().getAuthor().getName() + "</td>");
+                    out.println("<td>" + reservation.getReservedAt() + "</td>");
+                    out.println("<td>" + reservation.getStatus() + "</td>");
+                    out.println("<td><form action='StudentServlet' method='post'>");
+                    out.println("<input type='hidden' name='op' value='cancel'>");
+                    out.println("<input type='hidden' name='reservationId' value='" + reservation.getId() + "'>");
+                    out.println("<button type='submit'>Cancel</button>");
+                    out.println("</form></td>");
+                    out.println("</tr>");
+                }
+            } else {
+        %>
+        <tr>
+            <td colspan="6">No reservations found</td>
+        </tr>
+        <%
             }
         %>
     </table>

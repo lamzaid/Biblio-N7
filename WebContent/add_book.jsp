@@ -24,6 +24,8 @@
                 }
             %>
         </select><br><br>
+        <label for="copies">Number of Copies:</label>
+        <input type="number" id="copies" name="copies" required><br><br>
         <button type="submit">Add Book</button>
     </form>
 </body>
